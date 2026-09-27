@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم | عبدو فيش</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body { background: #f0f2f5; color: #333; min-height: 100vh; }
+
+#loginScreen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #002b4d, #001a2e);
+}
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+.login-box h1 { color: #002b4d; margin-bottom: 10px; }
+.login-box p { color: #777; margin-bottom: 25px; }
+.login-box input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+.login-box input:focus { border-color: #f1c40f; outline: none; }
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    background: #f1c40f;
+    color: #002b4d;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.login-box button:hover { background: #d4ac0d; }
+.error { color: #e74c3c; margin-top: 10px; font-size: 0.9rem; }
+
+#dashboard { display: none; padding: 20px; }
+.header-admin {
+    background: #002b4d;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.header-admin h1 { color: #f1c40f; font-size: 1.5rem; }
+.header-admin button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    text-align: center;
+}
+.stat-card h3 { color: #777; font-size: 0.9rem; margin-bottom: 10px; }
+.stat-card .num { font-size: 2.5rem; color: #002b4d; font-weight: bold; }
+
+.add-form {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+.add-form h2 { color: #002b4d; margin-bottom: 20px; }
+.add-form input, .add-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+.add-form input:focus, .add-form textarea:focus { border-color: #f1c40f; outline: none; }
+.add-form button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+.add-form button:hover { background: #219150; }
+
+.dishes-table {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+.dishes-table h2 { padding: 20px 25px; color: #002b4d; border-bottom: 2px solid #f0f2f5; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 15px; text-align: right; border-bottom: 1px solid #f0f2f5; }
+th { background: #f8f9fa; color: #777; font-size: 0.9rem; }
+td img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; }
+.btn-edit { background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; margin-left: 5px; }
+.btn-del { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+
+@media (max-width: 600px) {
+    th, td { padding: 10px; font-size: 0.85rem; }
+    td img { width: 40px; height: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="login-box">
+        <h1>🐟 عبدو فيش</h1>
+        <p>لوحة التحكم</p>
+        <input type="email" id="email" placeholder="البريد الإلكتروني">
+        <input type="password" id="password" placeholder="كلمة المرور">
+        <button onclick="login()">تسجيل الدخول</button>
+        <p class="error" id="errorMsg"></p>
+    </div>
+</div>
+
+<div id="dashboard">
+    <div class="header-admin">
+        <h1>🐟 لوحة تحكم عبدو فيش</h1>
+        <div>
+            <button onclick="window.open('index.html', '_blank')" style="background:#3498db;">🌐 عرض الموقع</button>
+            <button onclick="logout()">🚪 خروج</button>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3>عدد الأطباق</h3>
+            <div class="num" id="totalDishes">0</div>
+        </div>
+    </div>
+
+    <div class="add-form">
+        <h2 id="formTitle">➕ إضافة طبق جديد</h2>
+        <input type="text" id="dishName" placeholder="اسم الطبق">
+        <textarea id="dishDesc" placeholder="وصف الطبق" rows="2"></textarea>
+        <input type="text" id="dishPrice" placeholder="السعر (مثلاً: 35,000)">
+        <input type="url" id="dishImg" placeholder="رابط صورة الطبق">
+        <button onclick="saveDish()" id="saveBtn">حفظ الطبق</button>
+        <button onclick="cancelEdit()" id="cancelBtn" style="background:#95a5a6; display:none;">إلغاء</button>
+    </div>
+
+    <div class="dishes-table">
+        <h2>📋 قائمة الأطباق</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>الصورة</th>
+                    <th>الاسم</th>
+                    <th>السعر</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="dishesBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+let editingId = null;
+
+function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadDishes();
+        })
+        .catch(err => {
+            document.getElementById('errorMsg').textContent = 'خطأ: ' + err.message;
+        });
+}
+
+function logout() {
+    auth.signOut().then(() => location.reload());
+}
+
+auth.onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadDishes();
+    } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboard').style.display = 'none';
+    }
+});
+
+function loadDishes() {
+    db.collection('dishes').orderBy('name').onSnapshot(snapshot => {
+        const tbody = document.getElementById('dishesBody');
+        tbody.innerHTML = '';
+        document.getElementById('totalDishes').textContent = snapshot.size;
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            tbody.innerHTML += `
+                <tr>
+                    <td><img src="${d.img}" alt="${d.name}"></td>
+                    <td>${d.name}</td>
+                    <td>${d.price} ج.س</td>
+                    <td>
+                        <button class="btn-edit" onclick="editDish('${doc.id}')">✏️</button>
+                        <button class="btn-del" onclick="deleteDish('${doc.id}')">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+}
+
+function saveDish() {
+    const name = document.getElementById('dishName').value.trim();
+    const desc = document.getElementById('dishDesc').value.trim();
+    const price = document.getElementById('dishPrice').value.trim();
+    const img = document.getElementById('dishImg').value.trim();
+
+    if (!name || !price) { alert('الاسم والسعر مطلوبان'); return; }
+
+    const data = { name, desc, price, img: img || 'https://via.placeholder.com/300' };
+
+    if (editingId) {
+        db.collection('dishes').doc(editingId).update(data).then(() => {
+            alert('✅ تم التعديل');
+            cancelEdit();
+        });
+    } else {
+        db.collection('dishes').add(data).then(() => {
+            alert('✅ تمت الإضافة');
+            clearForm();
+        });
+    }
+}
+
+function editDish(id) {
+    db.collection('dishes').doc(id).get().then(doc => {
+        const d = doc.data();
+        document.getElementById('dishName').value = d.name;
+        document.getElementById('dishDesc').value = d.desc || '';
+        document.getElementById('dishPrice').value = d.price;
+        document.getElementById('dishImg').value = d.img || '';
+        editingId = id;
+        document.getElementById('formTitle').textContent = '✏️ تعديل طبق';
+        document.getElementById('saveBtn').textContent = 'تحديث';
+        document.getElementById('cancelBtn').style.display = 'inline-block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
+function cancelEdit() {
+    editingId = null;
+    clearForm();
+    document.getElementById('formTitle').textContent = '➕ إضافة طبق جديد';
+    document.getElementById('saveBtn').textContent = 'حفظ الطبق';
+    document.getElementById('cancelBtn').style.display = 'none';
+}
+
+function clearForm() {
+    document.getElementById('dishName').value = '';
+    document.getElementById('dishDesc').value = '';
+    document.getElementById('dishPrice').value = '';
+    document.getElementById('dishImg').value = '';
+}
+
+function deleteDish(id) {
+    if (confirm('هل أنت متأكد من الحذف؟')) {
+        db.collection('dishes').doc(id).delete().then(() => alert('🗑️ تم الحذف'));
+    }
+}
+</script>
+</body>
+</html>
